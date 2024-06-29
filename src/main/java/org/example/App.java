@@ -1,11 +1,14 @@
 package org.example;
 
+import java.math.BigDecimal;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class App {
     private static Scanner scanner = new Scanner(System.in);
     private static CheeseShop cheeseShop = new CheeseShop();
+    private static CheeseService cheeseService = new CheeseService(cheeseShop);
+    private static Customer customer = new Customer(12345678, new BigDecimal("5.00"));
 
     public static void main( String[] args ) {
 
@@ -67,7 +70,7 @@ public class App {
             double quantity = scanner.nextDouble();
 
             Cheese cheese = new Cheese(id, name, price, quantity);
-            cheeseShop.addCheeseToShop(cheese);
+            cheeseService.addCheeseToShop(cheese);
             cheeseShop.inventoryToJson();
 
         } catch (InputMismatchException e) {
@@ -79,7 +82,8 @@ public class App {
         try {
             System.out.println("Provide cheese id to delete: ");
             int id = scanner.nextInt();
-            cheeseShop.removeCheeseFromShop(id);
+            cheeseService.removeCheeseFromShop(id);
+            cheeseShop.inventoryToJson();
         } catch (InputMismatchException e) {
             System.out.println("\nInvalid input. Please enter correct ID.");
             scanner.nextLine();
@@ -101,7 +105,7 @@ public class App {
             System.out.println("Provide cheese quantity to update: ");
             double quantity = scanner.nextDouble();
 
-            cheeseShop.updateCheese(id, name, price, quantity);
+            cheeseService.updateCheese(id, name, price, quantity);
             System.out.println("org.example.Cheese with ID " + id + " updated successfully.");
             cheeseShop.inventoryToJson();
         } catch (InputMismatchException e) {
@@ -136,6 +140,7 @@ public class App {
             scanner.nextLine();
 
             cheeseShop.removeCheeseFromCart(id);
+            cheeseShop.inventoryToJson();
         } catch (InputMismatchException e) {
             System.out.println("\nInvalid input. Please enter correct ID.");
             scanner.nextLine();
@@ -144,10 +149,16 @@ public class App {
 
     public static void checkout() {
         cheeseShop.printCart();
-        System.out.println("Total to pay: " + cheeseShop.checkout());
-        cheeseShop.clearCart();
-        System.out.println("Thank you for your purchase!");
+        BigDecimal totalCost = cheeseShop.checkout();
+        System.out.println("Total to pay: " + totalCost);
+        if (customer.withdraw(totalCost)) {
+            customer.addToPurchases(cheeseShop.getCart());
+            customer.purchasesToJson();
+            cheeseShop.clearCart();
+            System.out.println("Thank you for your purchase!");
+        } else {
+            System.out.println("You don't have enough money, please review your cart.");
+        }
     }
-
 }
 
