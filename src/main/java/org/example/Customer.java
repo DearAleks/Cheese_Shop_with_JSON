@@ -22,6 +22,9 @@ public class Customer {
         this.purchases = new ArrayList<>();
     }
 
+    public BigDecimal getBalance() {
+        return this.balance;
+    }
     public boolean withdraw(BigDecimal howMuch) {
         if (balance.compareTo(howMuch) >= 0) {
             balance = balance.subtract(howMuch);
@@ -43,7 +46,4 @@ public class Customer {
             System.out.println(e);
         }
     }
-
-
-
 }

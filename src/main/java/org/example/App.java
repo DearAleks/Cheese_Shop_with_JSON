@@ -56,10 +56,6 @@ public class App {
     }
     public static void addCheese() {
         try {
-            System.out.println("Provide cheese id");
-            int id = scanner.nextInt();
-            scanner.nextLine();
-
             System.out.println("Provide cheese name");
             String name = scanner.nextLine();
 
@@ -69,7 +65,7 @@ public class App {
             System.out.println("Provide cheese quantity in kg");
             double quantity = scanner.nextDouble();
 
-            Cheese cheese = new Cheese(id, name, price, quantity);
+            Cheese cheese = new Cheese(name, price, quantity);
             cheeseService.addCheeseToShop(cheese);
             cheeseShop.inventoryToJson();
 
@@ -151,6 +147,7 @@ public class App {
         cheeseShop.printCart();
         BigDecimal totalCost = cheeseShop.checkout();
         System.out.println("Total to pay: " + totalCost);
+        System.out.println("Your balance: " + customer.getBalance());
         if (customer.withdraw(totalCost)) {
             customer.addToPurchases(cheeseShop.getCart());
             customer.purchasesToJson();

@@ -1,14 +1,19 @@
 package org.example;
 
-public class Cheese {
+import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class Cheese implements Serializable {
+
+    transient private static AtomicInteger idCounter = new AtomicInteger(0);
     private int id;
     private String name;
     private double price;
     private double quantity;
 
 
-    public Cheese(int id, String name, double price, double quantity){
-        this.id = id;
+    public Cheese(String name, double price, double quantity){
+        this.id = idCounter.incrementAndGet();
         this.name = name;
         this.price = price;
         this.quantity = quantity;

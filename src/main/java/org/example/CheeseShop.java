@@ -43,7 +43,7 @@ public class CheeseShop {
     public boolean addCheeseToCart(int id, double boughtQuantity) {
         for (Cheese cheese : cheeseList) {
             if (cheese.getId() == id && cheese.getQuantity() >= boughtQuantity) {
-                Cheese cheeseToCart = new Cheese(cheese.getId(), cheese.getName(), cheese.getPrice(), boughtQuantity);
+                Cheese cheeseToCart = new Cheese(cheese.getName(), cheese.getPrice(), boughtQuantity);
                 cheeseToCart.setQuantity(boughtQuantity);
                 cheese.setQuantity(cheese.getQuantity() - boughtQuantity);
                 cart.add(cheeseToCart);
