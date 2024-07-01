@@ -1,6 +1,7 @@
 package org.example;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -11,7 +12,7 @@ public class App {
     private static Customer customer = new Customer(12345678, new BigDecimal("5.00"));
 
     public static void main( String[] args ) {
-
+        cheeseShop.loadDataFromJson();
         while (true) {
             printMenu();
             try {
@@ -24,7 +25,7 @@ public class App {
                 } else if (action == 3) {
                     updateInventory();
                 } else if (action == 4) {
-                    cheeseShop.inventoryFromJson();
+                    cheeseShop.printCheeseList();
                 } else if (action == 5) {
                     addToCart();
                 } else if (action == 6) {
@@ -34,7 +35,10 @@ public class App {
                 } else if (action == 8) {
                     checkout();
                 } else if (action == 9) {
+                    printPurchases();
+                } else if (action == 10) {
                     System.out.println("Exiting the shop. Goodbye!");
+                    cheeseShop.saveDataToJson();
                     break;
                 }
             } catch (InputMismatchException e) {
@@ -52,7 +56,8 @@ public class App {
         System.out.println("To delete an item from the cart - 6");
         System.out.println("To review the items in the cart - 7");
         System.out.println("To checkout - 8");
-        System.out.println("To exit the shop - 9");
+        System.out.println("To view purchases - 9");
+        System.out.println("To exit the shop - 10");
     }
     public static void addCheese() {
         try {
@@ -67,7 +72,7 @@ public class App {
 
             Cheese cheese = new Cheese(name, price, quantity);
             cheeseService.addCheeseToShop(cheese);
-            cheeseShop.inventoryToJson();
+            cheeseShop.saveDataToJson();
 
         } catch (InputMismatchException e) {
             System.out.println("\nInvalid input. Please enter correct values.");
@@ -79,7 +84,7 @@ public class App {
             System.out.println("Provide cheese id to delete: ");
             int id = scanner.nextInt();
             cheeseService.removeCheeseFromShop(id);
-            cheeseShop.inventoryToJson();
+            cheeseShop.saveDataToJson();
         } catch (InputMismatchException e) {
             System.out.println("\nInvalid input. Please enter correct ID.");
             scanner.nextLine();
@@ -103,7 +108,7 @@ public class App {
 
             cheeseService.updateCheese(id, name, price, quantity);
             System.out.println("org.example.Cheese with ID " + id + " updated successfully.");
-            cheeseShop.inventoryToJson();
+            cheeseShop.saveDataToJson();
         } catch (InputMismatchException e) {
             System.out.println("\nInvalid input. Please enter correct value.");
             scanner.nextLine();
@@ -136,23 +141,33 @@ public class App {
             scanner.nextLine();
 
             cheeseShop.removeCheeseFromCart(id);
-            cheeseShop.inventoryToJson();
+            cheeseShop.saveDataToJson();
         } catch (InputMismatchException e) {
             System.out.println("\nInvalid input. Please enter correct ID.");
             scanner.nextLine();
         }
     }
 
+    public static void printPurchases() {
+        ArrayList<Cheese> purchases = cheeseShop.getPurchases();
+        if (purchases.isEmpty()) {
+            System.out.println("No purchases made yet.");
+        } else {
+            System.out.println("Your purchases: ");
+            for (Cheese cheese : purchases) {
+                System.out.println(cheese);
+            }
+        }
+    }
     public static void checkout() {
         cheeseShop.printCart();
         BigDecimal totalCost = cheeseShop.checkout();
         System.out.println("Total to pay: " + totalCost);
-        System.out.println("Your balance: " + customer.getBalance());
+        System.out.println("Your balance before purchase: " + customer.getBalance());
         if (customer.withdraw(totalCost)) {
-            customer.addToPurchases(cheeseShop.getCart());
-            customer.purchasesToJson();
             cheeseShop.clearCart();
             System.out.println("Thank you for your purchase!");
+            System.out.println("Your balance after purchase: " + customer.getBalance());
         } else {
             System.out.println("You don't have enough money, please review your cart.");
         }
